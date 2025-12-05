@@ -1,0 +1,78 @@
+# Binaries and build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+bin/
+dist/
+tmp/
+
+# Go workspace file
+go.work
+
+# Environment variables
+.env
+
+# IDE and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+.project
+.classpath
+.settings/
+*.iml
+
+# OS files
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+
+# Logs
+*.log
+logs/
+build-errors.log
+
+# Process IDs (for scripts)
+.pids
+
+# Backup and temporary files
+*.bak
+*.backup
+*.tmp
+*.temp
+*.orig
+*.save
+
+# Coverage reports
+*.cover
+coverage/
+coverage.txt
+
+# Dependency directories (if using vendor)
+# vendor/
+
+# Test results
+test-results/
+*.testresult
