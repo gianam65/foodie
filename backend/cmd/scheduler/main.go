@@ -17,7 +17,7 @@ func main() {
 	logger := log.New(os.Stdout, "scheduler ", log.LstdFlags|log.Lshortfile)
 
 	// Load environment variables
-	config.MustLoad()
+	config.Load()
 
 	// Initialize database connection
 	db, err := database.NewConnectionFromEnv()

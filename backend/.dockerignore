@@ -1,0 +1,78 @@
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+docs/
+*.md
+README.md
+
+# Binaries
+bin/
+dist/
+tmp/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+.project
+.classpath
+.settings/
+*.iml
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Logs
+*.log
+logs/
+build-errors.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Process IDs
+.pids
+
+# Test files
+*_test.go
+test-results/
+coverage/
+
+# Scripts (not needed in container)
+scripts/
+Makefile
+
+# Migrations (will be copied separately if needed)
+# migrations/
+
+# Docker files
+docker-compose.yml
+Dockerfile*
+.dockerignore
+
