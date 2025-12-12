@@ -91,6 +91,9 @@ services:
     container_name: foodie-http-server
     ports:
       - "${SERVER_PORT:-8080}:8080"
+    volumes:
+      # Mount api folder for Swagger (development)
+      - ./api:/app/api:ro
     environment:
       # Server config
       SERVER_HOST: 0.0.0.0
@@ -124,6 +127,8 @@ services:
       # Swagger config
       ENABLE_SWAGGER: ${ENABLE_SWAGGER:-true}
       SWAGGER_PATH: ${SWAGGER_PATH:-/swagger}
+      SWAGGER_USERNAME: ${SWAGGER_USERNAME:-}
+      SWAGGER_PASSWORD: ${SWAGGER_PASSWORD:-}
     networks:
       - foodie-network
     depends_on:

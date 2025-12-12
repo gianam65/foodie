@@ -47,6 +47,9 @@ WORKDIR /app
 # Copy binary from builder
 COPY --from=builder /app /app
 
+# Copy API specification files (for Swagger)
+COPY --from=builder /build/api /app/api
+
 # Change ownership
 RUN chown -R appuser:appuser /app
 
