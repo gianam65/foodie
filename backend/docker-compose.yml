@@ -6,7 +6,7 @@ services:
   # ============================================
 
   # PostgreSQL Database
-  sql-db:
+  sql:
     image: postgres:16-alpine
     container_name: foodie-postgres
     ports:
@@ -21,7 +21,11 @@ services:
     networks:
       - foodie-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-foodie}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-foodie} -d ${POSTGRES_DB:-foodie}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -92,16 +96,14 @@ services:
       SERVER_HOST: 0.0.0.0
       SERVER_PORT: 8080
       SERVER_ADDR: ""
-      # Database config
-      DB_HOST: sql-db
+      # Database config (code will auto-build SQL_DSN from these variables)
+      DB_HOST: sql
       DB_PORT: 5432
       DB_USER: ${POSTGRES_USER:-foodie}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-foodie123}
       DB_NAME: ${POSTGRES_DB:-foodie}
       DB_SSLMODE: disable
-      # SQL DSN (used by database connection)
       SQL_DRIVER: postgres
-      SQL_DSN: postgres://${POSTGRES_USER:-foodie}:${POSTGRES_PASSWORD:-foodie123}@sql-db:5432/${POSTGRES_DB:-foodie}?sslmode=disable
       # Redis config
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -125,7 +127,7 @@ services:
     networks:
       - foodie-network
     depends_on:
-      sql-db:
+      sql:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -158,16 +160,14 @@ services:
         COMMIT_SHA: ${COMMIT_SHA:-unknown}
     container_name: foodie-scheduler
     environment:
-      # Database config
-      DB_HOST: sql-db
+      # Database config (code will auto-build SQL_DSN from these variables)
+      DB_HOST: sql
       DB_PORT: 5432
       DB_USER: ${POSTGRES_USER:-foodie}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-foodie123}
       DB_NAME: ${POSTGRES_DB:-foodie}
       DB_SSLMODE: disable
-      # SQL DSN (used by database connection)
       SQL_DRIVER: postgres
-      SQL_DSN: postgres://${POSTGRES_USER:-foodie}:${POSTGRES_PASSWORD:-foodie123}@sql-db:5432/${POSTGRES_DB:-foodie}?sslmode=disable
       # Logging config
       LOG_LEVEL: ${LOG_LEVEL:-info}
       LOG_FORMAT: ${LOG_FORMAT:-json}
@@ -175,7 +175,7 @@ services:
     networks:
       - foodie-network
     depends_on:
-      sql-db:
+      sql:
         condition: service_healthy
     command: ["/app/scheduler"]
     restart: unless-stopped
@@ -205,7 +205,7 @@ services:
       RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE:-foodie_events}
       MESSAGE_BROKER_TYPE: rabbitmq
       # Database config (for processing tasks)
-      DB_HOST: sql-db
+      DB_HOST: sql
       DB_PORT: 5432
       DB_USER: ${POSTGRES_USER:-foodie}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-foodie123}
@@ -220,7 +220,7 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      sql-db:
+      sql:
         condition: service_healthy
     command: ["/app/worker", "${WORKER_TYPE:-order}"]
     restart: unless-stopped

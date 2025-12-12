@@ -7,8 +7,10 @@ import (
 	"log"
 	"os"
 
+	"foodie/backend/internal/infrastructure/database"
 	"foodie/backend/pkg/config"
 	"foodie/backend/pkg/migrate"
+
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 )
@@ -25,9 +27,9 @@ func main() {
 	config.MustLoad()
 
 	// Get database connection string from environment
-	dsn := config.Get("SQL_DSN", "")
+	dsn := database.BuildDSN()
 	if dsn == "" {
-		log.Fatalf("SQL_DSN environment variable is required")
+		log.Fatalf("SQL_DSN or (DB_USER/POSTGRES_USER, DB_PASSWORD/POSTGRES_PASSWORD, DB_NAME/POSTGRES_DB) environment variables are required")
 	}
 
 	// Open database connection

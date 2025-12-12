@@ -6,9 +6,44 @@ import (
 	"time"
 
 	"foodie/backend/pkg/config"
+
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 )
+
+// BuildDSN builds a database connection string from environment variables.
+// It tries to use SQL_DSN if available, otherwise builds DSN from individual variables.
+// Returns empty string if required variables are missing.
+func BuildDSN() string {
+	dsn := config.Get("SQL_DSN", "")
+	if dsn != "" {
+		return dsn
+	}
+
+	host := config.Get("DB_HOST", "localhost")
+	port := config.Get("DB_PORT", "5432")
+	user := config.Get("DB_USER", "")
+	password := config.Get("DB_PASSWORD", "")
+	dbname := config.Get("DB_NAME", "")
+	sslmode := config.Get("DB_SSLMODE", "disable")
+
+	// Fallback to POSTGRES_* variables if DB_* not set
+	if user == "" {
+		user = config.Get("POSTGRES_USER", "")
+	}
+	if password == "" {
+		password = config.Get("POSTGRES_PASSWORD", "")
+	}
+	if dbname == "" {
+		dbname = config.Get("POSTGRES_DB", "")
+	}
+
+	if user == "" || password == "" || dbname == "" {
+		return ""
+	}
+
+	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", user, password, host, port, dbname, sslmode)
+}
 
 // Config holds database configuration.
 type Config struct {
@@ -54,12 +89,13 @@ func NewConnection(cfg Config) (*sql.DB, error) {
 }
 
 // NewConnectionFromEnv creates a database connection from environment variables.
+// It tries to use SQL_DSN if available, otherwise builds DSN from individual variables.
 func NewConnectionFromEnv() (*sql.DB, error) {
 	driver := config.Get("SQL_DRIVER", "postgres")
-	dsn := config.Get("SQL_DSN", "")
+	dsn := BuildDSN()
 
 	if dsn == "" {
-		return nil, fmt.Errorf("SQL_DSN environment variable is required")
+		return nil, fmt.Errorf("SQL_DSN or (DB_USER/POSTGRES_USER, DB_PASSWORD/POSTGRES_PASSWORD, DB_NAME/POSTGRES_DB) environment variables are required")
 	}
 
 	cfg := Config{

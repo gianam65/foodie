@@ -10,6 +10,14 @@ bin/
 dist/
 tmp/
 
+# Binary files built in root directory (from go build/run in cmd/)
+schema-check
+schema-sync
+migrate
+server
+scheduler
+queue-worker
+
 # Go workspace file
 go.work
 

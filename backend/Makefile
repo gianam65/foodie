@@ -25,6 +25,34 @@ migrate-up: ## Run database migrations
 migrate-down: ## Rollback last migration
 	@go run ./cmd/migrate -command=down -driver=postgres
 
+schema-check: ## Check database schema for a table (usage: make schema-check TABLE=products)
+	@if [ -z "$(TABLE)" ]; then \
+		echo "Error: TABLE is required. Usage: make schema-check TABLE=products"; \
+		exit 1; \
+	fi
+	@go run ./cmd/schema-check -table=$(TABLE)
+
+schema-sync: ## Auto-detect and create migration for missing columns (usage: make schema-sync TABLE=products)
+	@if [ -z "$(TABLE)" ]; then \
+		echo "Error: TABLE is required. Usage: make schema-sync TABLE=products"; \
+		exit 1; \
+	fi
+	@go run ./cmd/schema-sync -table=$(TABLE)
+
+migrate-create: ## Create a new migration file (usage: make migrate-create NAME=add_user_table)
+	@if [ -z "$(NAME)" ]; then \
+		echo "Error: NAME is required. Usage: make migrate-create NAME=add_user_table"; \
+		exit 1; \
+	fi
+	@if command -v migrate > /dev/null; then \
+		migrate create -ext sql -dir migrations -seq $(NAME); \
+	else \
+		echo "Installing golang-migrate CLI..."; \
+		go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest; \
+		$$(go env GOPATH)/bin/migrate create -ext sql -dir migrations -seq $(NAME); \
+	fi
+	@echo "✅ Migration files created! Edit migrations/*_$(NAME).up.sql and migrations/*_$(NAME).down.sql"
+
 build: ## Build the application
 	@go build -o bin/server ./cmd/server
 
